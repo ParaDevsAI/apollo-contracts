@@ -121,11 +121,21 @@ impl QuestManager {
         if duration_seconds == 0 {
             panic_with_error!(&env, Error::InvalidDuration);
         }
+        //Verifica se usuario tem saldo para pagar a reward pool
+        if reward_pool_amount > 0  {
+            let reward_token_client = token::Client::new(&env, &reward_token);
+            let balance = reward_token_client.balance(&admin);
+            if balance < reward_pool_amount {
+                panic_with_error!(&env, Error::InsufficientBalance); 
+            }
+        }
 
-        // Deposita a pool de recompensas no contrato
-        // Para testes, comentamos a transferência de token
-        // let reward_token_client = token::Client::new(&env, &reward_token);
-        // reward_token_client.transfer(&admin, &env.current_contract_address(), &(reward_pool_amount as i128));
+        // Transfere os tokens de recompensa para o contrato
+        reward_token_client.transfer(
+            &admin,
+            &env.current_contract_address(),
+            &(reward_pool_amount as i128)
+        );
 
         // Gera um novo ID para a quest
         let quest_id: u64 = env.storage().instance().get(&DataKey::QuestCounter).unwrap_or(0);
