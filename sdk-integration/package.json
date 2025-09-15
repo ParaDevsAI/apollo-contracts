@@ -1,0 +1,27 @@
+{
+  "name": "quest-manager-sdk",
+  "version": "1.0.0",
+  "description": "SDK para interagir com o QuestManager smart contract",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js",
+    "create-quest": "node examples/create-quest.js",
+    "list-quests": "node examples/list-quests.js",
+    "register": "node examples/register.js"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^12.1.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0"
+  },
+  "keywords": [
+    "stellar",
+    "soroban",
+    "smart-contract",
+    "quest-manager"
+  ]
+}

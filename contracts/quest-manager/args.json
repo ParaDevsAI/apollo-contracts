@@ -1,0 +1,12 @@
+{
+  "admin": "GDOIXDCMHEQWTXVMAOUKIKTOBM5TS5F5RVRCGZS6GPNAQZIOCBHMVS2P",
+  "reward_token": "GDOIXDCMHEQWTXVMAOUKIKTOBM5TS5F5RVRCGZS6GPNAQZIOCBHMVS2P", 
+  "reward_per_winner": 10,
+  "max_winners": 10,
+  "distribution": "Raffle",
+  "quest_type": {"TradeVolume": [200]},
+  "duration_seconds": 86400,
+  "reward_pool_amount": 100,
+  "title": "Volume Challenge",
+  "description": "Trade 200 volume"
+}
