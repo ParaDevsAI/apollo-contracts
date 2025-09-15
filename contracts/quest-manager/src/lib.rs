@@ -352,12 +352,11 @@ impl QuestManager {
         let reward_token_client = token::Client::new(&env, &quest.reward_token);
 
         for winner in winners.iter() {
-            // Para testes, vamos apenas simular a distribuição
-            // reward_token_client.transfer(
-            //     &env.current_contract_address(), 
-            //     &winner, 
-            //     &(quest.reward_per_winner as i128)
-            // );
+            winner.transfer(
+                &env.current_contract_address(),
+                &winner,
+                &(quest.reward_per_winner as i128)
+            );
         }
     }
 
@@ -402,7 +401,7 @@ impl QuestManager {
     pub fn get_winners(env: Env, quest_id: u64) -> Vec<Address> {
         env.storage().persistent()
             .get(&DataKey::Winners(quest_id))
-            .unwrap_or(Vec::new(&env))
+            
     }
 
     /// Verifica se um usuário está registrado em uma quest
@@ -478,16 +477,11 @@ impl QuestManager {
         env.storage().persistent().set(&DataKey::Quests(quest_id), &quest);
 
         // Retorna os fundos para o admin (para testes, apenas simulado)
-        // let reward_token_client = token::Client::new(&env, &quest.reward_token);
-        // let balance = reward_token_client.balance(&env.current_contract_address());
-        
-        // if balance > 0 {
-        //     reward_token_client.transfer(
-        //         &env.current_contract_address(),
-        //         &quest.admin,
-        //         &balance
-        //     );
-        // }
+        admin.transfer(
+            &env.current_contract_address(),
+            &quest.admin,
+            &(quest.total_reward_pool as i128)
+        );
 
         // Emit event
         env.events().publish((Symbol::new(&env, "quest_cancelled"),), quest_id);
