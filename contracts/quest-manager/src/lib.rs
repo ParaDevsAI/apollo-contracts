@@ -121,21 +121,24 @@ impl QuestManager {
         if duration_seconds == 0 {
             panic_with_error!(&env, Error::InvalidDuration);
         }
+        
+        // Cria o cliente do token de recompensa
+        let reward_token_client = token::Client::new(&env, &reward_token);
+        
         //Verifica se usuario tem saldo para pagar a reward pool
         if reward_pool_amount > 0  {
-            let reward_token_client = token::Client::new(&env, &reward_token);
             let balance = reward_token_client.balance(&admin);
-            if balance < reward_pool_amount {
+            if balance < (reward_pool_amount as i128) {
                 panic_with_error!(&env, Error::InsufficientBalance); 
             }
+            
+            // Transfere os tokens de recompensa para o contrato
+            reward_token_client.transfer(
+                &admin,
+                &env.current_contract_address(),
+                &(reward_pool_amount as i128)
+            );
         }
-
-        // Transfere os tokens de recompensa para o contrato
-        reward_token_client.transfer(
-            &admin,
-            &env.current_contract_address(),
-            &(reward_pool_amount as i128)
-        );
 
         // Gera um novo ID para a quest
         let quest_id: u64 = env.storage().instance().get(&DataKey::QuestCounter).unwrap_or(0);
@@ -352,7 +355,7 @@ impl QuestManager {
         let reward_token_client = token::Client::new(&env, &quest.reward_token);
 
         for winner in winners.iter() {
-            winner.transfer(
+            reward_token_client.transfer(
                 &env.current_contract_address(),
                 &winner,
                 &(quest.reward_per_winner as i128)
@@ -401,7 +404,7 @@ impl QuestManager {
     pub fn get_winners(env: Env, quest_id: u64) -> Vec<Address> {
         env.storage().persistent()
             .get(&DataKey::Winners(quest_id))
-            
+            .unwrap_or(Vec::new(&env))
     }
 
     /// Verifica se um usuário está registrado em uma quest
@@ -476,8 +479,9 @@ impl QuestManager {
         quest.is_active = false;
         env.storage().persistent().set(&DataKey::Quests(quest_id), &quest);
 
-        // Retorna os fundos para o admin (para testes, apenas simulado)
-        admin.transfer(
+        // Retorna os fundos para o admin
+        let reward_token_client = token::Client::new(&env, &quest.reward_token);
+        reward_token_client.transfer(
             &env.current_contract_address(),
             &quest.admin,
             &(quest.total_reward_pool as i128)

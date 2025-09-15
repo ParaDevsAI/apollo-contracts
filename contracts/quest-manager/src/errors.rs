@@ -18,4 +18,5 @@ pub enum Error {
     InvalidDuration = 12,
     NoWinners = 13,
     Unauthorized = 14,
+    InsufficientBalance = 15,
 }
